@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Aprobaciones{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-4">
+  <div>
+    <h1 class="text-xl font-bold text-gray-900">Aprobaciones</h1>
+    <p class="text-sm text-gray-500 mt-0.5">Revise solicitudes de alta de instituciones</p>
+  </div>
+
+  <div class="card overflow-hidden">
+    {% if pending %}
+    <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-gray-900">Solicitudes pendientes</h2>
+      <span class="text-xs text-gray-500 tabular-nums">{{ pending|length }}</span>
+    </div>
+    <ul class="divide-y divide-gray-50">
+      {% for row in pending %}
+      <li class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-gray-50/60 transition-colors">
+        <div class="min-w-0">
+          <h3 class="text-sm font-semibold text-gray-900 truncate">{{ row.name }}</h3>
+          <p class="text-xs text-gray-500 font-mono mt-0.5">{{ row.slug }}</p>
+          <p class="text-xs text-gray-400 mt-1">
+            Solicitante: <span class="font-medium text-gray-600">{{ row.owner_username }}</span>
+            {% if row.created_at %} · {{ row.created_at }}{% endif %}
+          </p>
+        </div>
+        <div class="flex gap-2 flex-shrink-0">
+          <form method="post">
+            <input type="hidden" name="action" value="approve">
+            <input type="hidden" name="institution_id" value="{{ row.id }}">
+            <button type="submit" class="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors">Aprobar</button>
+          </form>
+          <form method="post" onsubmit="return confirm('Rechazar esta solicitud?');">
+            <input type="hidden" name="action" value="reject">
+            <input type="hidden" name="institution_id" value="{{ row.id }}">
+            <button type="submit" class="px-3.5 py-1.5 rounded-md text-xs font-semibold border border-red-300 text-red-700 hover:bg-red-50 transition-colors">Rechazar</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="p-12 text-center">
+      <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <p class="text-sm text-gray-500 font-medium">No hay solicitudes pendientes</p>
+      <p class="text-xs text-gray-400 mt-1">Cuando un usuario envie una nueva institucion, aparecera aqui.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <p class="text-center">
+    <a href="{{ url_for('select_institution') }}" class="text-sm text-p-700 font-medium hover:underline">Volver a instituciones</a>
+  </p>
+</div>
+{% endblock %}

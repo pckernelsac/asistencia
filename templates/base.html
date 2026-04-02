@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Sistema de Asistencia{% endblock %}</title>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+  {% block head_extra %}{% endblock %}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] },
+          colors: {
+            p: {
+              50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 300: '#d8b4fe',
+              400: '#c084fc', 500: '#a855f7', 600: '#7c0ed0', 700: '#6802c1',
+              800: '#5301a0', 900: '#3d0170', 950: '#2e0057'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    :root{--sb-w:15.5rem;--sb-c:4.25rem;--sb:var(--sb-w);--ease:cubic-bezier(.4,0,.2,1);--dur:200ms}
+    html.sc{--sb:var(--sb-c)}
+    html{overflow-x:hidden}
+
+    .sb{width:var(--sb);transition:width var(--dur) var(--ease),transform var(--dur) var(--ease)}
+    .mn{transition:margin-left var(--dur) var(--ease);min-width:0}
+
+    .sl{transition:opacity var(--dur) var(--ease);white-space:nowrap}
+    html.sc .sl{opacity:0;width:0;overflow:hidden;position:absolute;pointer-events:none}
+    html.sc .sb-brand{opacity:0;width:0;overflow:hidden;position:absolute;pointer-events:none}
+    html.sc .sb-sec{opacity:0;height:0;margin:0;overflow:hidden}
+    html.sc .sb-link{justify-content:center;padding-left:0;padding-right:0}
+    html.sc .sb-link svg:first-child{margin-right:0}
+    html.sc #btn-col .ic{transform:rotate(180deg)}
+    html.sc .sb-user{justify-content:center;gap:0;padding:.5rem}
+    html.sc .sb-user .sb-meta{display:none}
+
+    @media(max-width:767px){
+      .sb{position:fixed;inset-block:0;left:0;width:min(16.5rem,85vw)!important;z-index:60;transform:translateX(-100%);box-shadow:none}
+      html.mo .sb{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.3)}
+      .mn{margin-left:0}
+      html.mo .sb-ov{opacity:1;pointer-events:auto}
+      html.sc .sl,html.sc .sb-brand,html.sc .sb-sec{opacity:1;width:auto;height:auto;position:static;overflow:visible;pointer-events:auto}
+      html.sc .sb-link{justify-content:flex-start;padding-left:.75rem;padding-right:.75rem}
+      html.sc .sb-link svg:first-child{margin-right:.75rem}
+      #btn-col{display:none!important}
+    }
+
+    .sb-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:55;opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease)}
+    .sb-link{display:flex;align-items:center;gap:.625rem;padding:.5rem .75rem;border-radius:.5rem;font-size:.8125rem;font-weight:500;color:rgba(255,255,255,.55);transition:all .15s ease}
+    .sb-link:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+    .sb-link svg:first-child{flex-shrink:0;color:rgba(255,255,255,.35);transition:color .15s ease}
+    .sb-link:hover svg:first-child{color:rgba(255,255,255,.7)}
+    .sb-link.on{background:rgba(168,85,247,.2);color:#e9d5ff;font-weight:600}
+    .sb-link.on svg:first-child{color:#c084fc}
+    .sb-link--dim{color:rgba(255,255,255,.35)}
+    .sb-link--dim:hover{color:rgba(255,255,255,.65)}
+    .sb-link--warn{background:rgba(251,191,36,.08);color:#fbbf24}
+    .sb-link--warn:hover{background:rgba(251,191,36,.14);color:#fde68a}
+    .sb-link--warn svg:first-child{color:#f59e0b}
+    .sb-link--red{color:#f87171}
+    .sb-link--red:hover{background:rgba(248,113,113,.08);color:#fca5a5}
+    .sb-link--red svg:first-child{color:#ef4444}
+    .ic{transition:transform var(--dur) var(--ease)}
+
+    .toast{position:fixed;top:1.25rem;right:1.25rem;z-index:9999;display:none;padding:.625rem 1rem;border-radius:.5rem;color:#fff;font-weight:500;font-size:.8125rem;background:#1e1b4b;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:toastIn .25s ease-out}
+    .toast.error{background:#dc2626}.toast.success{background:#059669}.toast.show{display:flex;align-items:center;gap:.5rem}
+    @keyframes toastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#7c0ed0;box-shadow:0 0 0 3px rgba(124,14,208,.12)}
+
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:.75rem}
+
+    @media(max-width:640px){.toast{left:.75rem;right:.75rem}}
+    @media(max-width:768px){.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}table{min-width:600px}}
+    @media print{.sb,.sb-ov,#btn-mob,#toast{display:none!important}.mn{margin-left:0!important}body{background:#fff!important}}
+
+    .scr::-webkit-scrollbar{width:4px}
+    .scr::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
+    .scr{scrollbar-color:rgba(255,255,255,.12) transparent;scrollbar-width:thin}
+  </style>
+</head>
+<body class="min-h-screen flex bg-gray-50 font-sans">
+  <div id="sb-ov" class="sb-ov md:hidden" aria-hidden="true"></div>
+
+  <!-- ═══ Sidebar ═══ -->
+  <aside id="sb" class="sb flex flex-col flex-shrink-0 bg-gradient-to-b from-p-900 via-p-950 to-[#1a0038]">
+    <!-- Brand -->
+    <div class="flex items-center gap-3 px-4 h-14 flex-shrink-0">
+      <a href="{{ nav_home_url }}" class="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+        <img src="{{ url_for('static', filename='img/2.png') }}" alt="" class="w-8 h-8 object-contain flex-shrink-0 rounded-lg ring-1 ring-white/10">
+        <div class="sb-brand min-w-0">
+          <span class="font-semibold text-[13px] text-white/90 leading-tight block truncate">Asistencia</span>
+          {% if current_institution_name %}
+          <span class="text-[10px] text-white/40 truncate block" title="{{ current_institution_name }}">{{ current_institution_name }}</span>
+          {% endif %}
+        </div>
+      </a>
+      <button type="button" id="btn-col" class="hidden md:flex flex-shrink-0 w-7 h-7 items-center justify-center rounded-md text-white/30 hover:text-white/70 hover:bg-white/5 transition-colors" title="Contraer">
+        <svg class="ic w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+      </button>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 space-y-0.5 scr">
+      {% if current_institution_id %}
+      <p class="sb-sec px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/25">Menu</p>
+      <a href="{{ url_for('dashboard') }}" class="sb-link" title="Dashboard">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        <span class="sl">Dashboard</span>
+      </a>
+      <a href="{{ url_for('scan') }}" class="sb-link" title="Escanear">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+        <span class="sl">Escanear</span>
+      </a>
+      <a href="{{ url_for('students') }}" class="sb-link" title="Estudiantes">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <span class="sl">Estudiantes</span>
+      </a>
+      <a href="{{ url_for('reports') }}" class="sb-link" title="Reportes">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span class="sl">Reportes</span>
+      </a>
+      <div class="!mt-2 border-t border-white/5 pt-2">
+        <a href="{{ url_for('select_institution') }}" class="sb-link sb-link--dim" title="Cambiar institucion">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          <span class="sl">Cambiar institucion</span>
+        </a>
+      </div>
+      {% endif %}
+
+      {% if session.get('user_id') and not current_institution_id %}
+      <p class="sb-sec px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/25">Instituciones</p>
+      <a href="{{ url_for('select_institution') }}" class="sb-link" title="Mis instituciones">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <span class="sl">Mis instituciones</span>
+      </a>
+      <a href="{{ url_for('register_institution') }}" class="sb-link" title="Nueva institucion">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4v16m8-8H4"/></svg>
+        <span class="sl">Nueva institucion</span>
+      </a>
+      {% endif %}
+
+      {% if session.get('user_id') and is_super_master %}
+      <p class="sb-sec px-2 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/25">Admin</p>
+      <a href="{{ url_for('admin_pending_institutions') }}" class="sb-link sb-link--warn" title="Aprobaciones">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span class="sl">Aprobaciones</span>
+      </a>
+      {% endif %}
+    </nav>
+
+    <!-- User -->
+    <div class="mt-auto border-t border-white/5 p-3 space-y-0.5">
+      {% if session.get('username') %}
+      <div class="sb-user flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-white/5">
+        <div class="w-7 h-7 flex-shrink-0 rounded-full bg-p-600/40 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-p-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+        </div>
+        <div class="sb-meta min-w-0 flex-1">
+          <p class="text-xs text-white/70 font-medium truncate sl">{{ session.get('username') }}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% if session.get('user_id') %}
+      <a href="{{ url_for('logout') }}" class="sb-link sb-link--red" title="Cerrar sesion">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <span class="sl">Cerrar sesion</span>
+      </a>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- ═══ Main ═══ -->
+  <div class="mn flex-1 flex flex-col min-h-screen">
+    <!-- Mobile toggle -->
+    <div class="md:hidden flex items-center h-12 px-4 bg-white border-b border-gray-200 flex-shrink-0">
+      <button type="button" id="btn-mob" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="px-4 sm:px-6 lg:px-8 pt-4 max-w-7xl mx-auto w-full">
+        {% for category, message in messages %}
+        <div class="mb-3 flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium
+          {% if category=='error' %}bg-red-50 text-red-700 border border-red-200
+          {% elif category=='success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+          {% else %}bg-gray-50 text-gray-700 border border-gray-200{% endif %}">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            {% if category=='success' %}<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            {% elif category=='error' %}<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            {% else %}<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>{% endif %}
+          </svg>
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Content -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto w-full">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  {% block scripts %}{% endblock %}
+
+  <script>
+  (function(){
+    var r=document.documentElement,K='fh-sc';
+    function col(v){r.classList.toggle('sc',v);var b=document.getElementById('btn-col');if(b)b.setAttribute('aria-expanded',v?'false':'true')}
+    if(window.matchMedia('(min-width:768px)').matches){try{if(localStorage.getItem(K)==='1')col(true)}catch(e){}}
+    document.addEventListener('DOMContentLoaded',function(){
+      var p=window.location.pathname;
+      document.querySelectorAll('.sb-link').forEach(function(l){var h=l.getAttribute('href');if(h&&h===p)l.classList.add('on')});
+      var c=document.getElementById('btn-col');
+      if(c)c.addEventListener('click',function(){var on=r.classList.toggle('sc');try{localStorage.setItem(K,on?'1':'0')}catch(e){}});
+      var m=document.getElementById('btn-mob'),ov=document.getElementById('sb-ov');
+      function mob(o){r.classList.toggle('mo',o);document.body.style.overflow=o?'hidden':''}
+      if(m)m.addEventListener('click',function(){mob(!r.classList.contains('mo'))});
+      if(ov)ov.addEventListener('click',function(){mob(false)});
+      document.getElementById('sb')?.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){if(window.matchMedia('(max-width:767px)').matches)mob(false)})});
+    });
+  })();
+  </script>
+</body>
+</html>

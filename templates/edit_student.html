@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Editar estudiante{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-4">
+  <a href="{{ url_for('students') }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    Volver a estudiantes
+  </a>
+
+  <div class="card p-5 sm:p-6">
+    <h2 class="text-sm font-semibold text-gray-900 mb-4">Datos del estudiante</h2>
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Nombres</label>
+          <input name="nombres" required value="{{ student['nombres'] }}" placeholder="Juan Carlos"
+                 class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Apellidos</label>
+          <input name="apellidos" required value="{{ student['apellidos'] }}" placeholder="Garcia Lopez"
+                 class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">DNI</label>
+        <input name="dni" required value="{{ student['dni'] }}" placeholder="12345678" pattern="[0-9]{8}" maxlength="8"
+               class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 font-mono">
+        <p class="text-[11px] text-gray-400 mt-1">8 digitos numericos</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">Foto</label>
+        {% if student['photo'] %}
+        <div class="flex items-center gap-4 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+          <img src="{{ url_for('static', filename='uploads/' + student['photo']) }}" alt="" class="w-20 h-20 rounded-lg object-cover border border-gray-200">
+          <p class="text-xs text-gray-500">Selecciona una nueva foto para reemplazar la actual, o deja vacio para mantenerla.</p>
+        </div>
+        {% else %}
+        <div class="mb-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+          <p class="text-xs text-amber-800">Este estudiante no tiene foto. Puedes subir una ahora.</p>
+        </div>
+        {% endif %}
+
+        <input type="file" name="photo" accept="image/*" id="photo-input" class="hidden">
+        <label for="photo-input" class="flex items-center justify-center w-full px-3 py-5 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50/30 transition-colors">
+          <div class="text-center">
+            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <p class="text-xs text-gray-500 mt-1">Click para {% if student['photo'] %}cambiar{% else %}seleccionar{% endif %} foto</p>
+          </div>
+        </label>
+        <div id="photo-preview" class="hidden mt-2">
+          <img id="preview-img" src="" alt="" class="w-full h-40 object-cover rounded-lg border border-gray-200">
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-p-700 hover:bg-p-600 transition-colors">Guardar cambios</button>
+        <a href="{{ url_for('students') }}" class="px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors text-center">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const photoInput = document.getElementById('photo-input');
+const photoPreview = document.getElementById('photo-preview');
+const previewImg = document.getElementById('preview-img');
+photoInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) { const reader = new FileReader(); reader.onload = function(e) { previewImg.src = e.target.result; photoPreview.classList.remove('hidden'); }; reader.readAsDataURL(file); }
+  else { photoPreview.classList.add('hidden'); }
+});
+</script>
+{% endblock %}

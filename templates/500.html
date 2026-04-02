@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}500 · Error del servidor{% endblock %}
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+  <div class="max-w-md w-full text-center">
+    <div class="card p-8">
+      <p class="text-6xl font-extrabold text-red-500 mb-2">500</p>
+      <h2 class="text-lg font-bold text-gray-900 mb-2">Error interno del servidor</h2>
+      <p class="text-sm text-gray-500 mb-6">Algo salio mal. Ya estamos trabajando para solucionarlo.</p>
+
+      {% if config.DEBUG %}
+      <div class="bg-gray-900 rounded-lg p-4 mb-6 text-left">
+        <p class="text-xs font-medium text-amber-400 mb-2">Debug info</p>
+        <pre class="text-xs text-green-400 font-mono overflow-x-auto">{{ error if error else 'Error interno. Revisa los logs.' }}</pre>
+      </div>
+      {% endif %}
+
+      <div class="rounded-lg border border-red-200 bg-red-50 p-3.5 mb-6 text-left">
+        <p class="text-xs font-medium text-red-800 mb-1.5">Que puedes hacer:</p>
+        <ul class="text-xs text-red-700 space-y-1">
+          <li>Espera unos minutos e intenta nuevamente</li>
+          <li>Vuelve al dashboard usando el boton de abajo</li>
+          <li>Si persiste, contacta al administrador</li>
+        </ul>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2 justify-center">
+        <a href="{{ url_for('dashboard') }}" class="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-p-700 hover:bg-p-600 transition-colors inline-flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+          Ir al Dashboard
+        </a>
+        <button onclick="location.reload()" class="px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors inline-flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Reintentar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

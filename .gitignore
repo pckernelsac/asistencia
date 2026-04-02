@@ -1,0 +1,33 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+instance/*.db
+instance/*.db-wal
+instance/*.db-shm
+static/uploads/*
+!static/uploads/.gitkeep
+.env
+.vscode/
+.idea/
+*.log
+
+# cPanel / Passenger
+passenger_wsgi.pyc
+tmp/
+.cpanel/
+
+# Testing
+test_concurrency.py
+
+# OS
+.DS_Store
+Thumbs.db
+festihack_produccion.zip

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}QR · {{ student['nombres'] }} {{ student['apellidos'] }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-4">
+  <a href="{{ url_for('students') }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    Volver a estudiantes
+  </a>
+
+  <div class="card overflow-hidden">
+    <!-- Student header -->
+    <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+      {% if student['photo'] %}
+      <img src="{{ url_for('static', filename='uploads/' + student['photo']) }}" alt="" class="w-12 h-12 rounded-lg object-cover border border-gray-200">
+      {% else %}
+      <div class="w-12 h-12 rounded-lg bg-p-700 flex items-center justify-center text-white font-bold text-sm">{{ student['nombres'][0] }}{{ student['apellidos'][0] }}</div>
+      {% endif %}
+      <div>
+        <h2 class="text-sm font-semibold text-gray-900">{{ student['nombres'] }} {{ student['apellidos'] }}</h2>
+        <p class="text-xs text-gray-500 font-mono">DNI {{ student['dni'] }}</p>
+      </div>
+    </div>
+
+    <!-- QR + Actions -->
+    <div class="p-5 sm:p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="text-center" id="qr-section">
+          <div class="bg-white rounded-lg border border-gray-200 p-6 inline-block shadow-sm">
+            <img src="{{ url_for('student_qr_image', sid=student['id']) }}" alt="QR" class="w-52 h-52 mx-auto" id="qr-image"
+                 onerror="this.parentElement.innerHTML='<div class=\'w-52 h-52 flex items-center justify-center bg-red-50 text-red-600 rounded-lg border border-red-200\'><p class=\'text-sm p-4\'>Error al cargar QR</p></div>'">
+          </div>
+          <p class="text-xs text-gray-500 mt-3">Codigo QR - DNI: {{ student['dni'] }}</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <p class="text-xs font-medium text-gray-700 mb-2">Informacion</p>
+            <ul class="text-xs text-gray-600 space-y-1.5">
+              <li>El QR codifica el DNI del estudiante.</li>
+              <li>Escaneo desde la pagina Escanear.</li>
+              <li>Imprima o descargue segun necesite.</li>
+            </ul>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <svg class="w-4 h-4 text-p-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+              <div>
+                <p class="text-[11px] text-gray-500">Nombres</p>
+                <p class="text-sm font-medium text-gray-800">{{ student['nombres'] }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <svg class="w-4 h-4 text-p-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+              <div>
+                <p class="text-[11px] text-gray-500">Apellidos</p>
+                <p class="text-sm font-medium text-gray-800">{{ student['apellidos'] }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <svg class="w-4 h-4 text-p-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+              <div>
+                <p class="text-[11px] text-gray-500">DNI</p>
+                <p class="text-sm font-medium text-gray-800 font-mono">{{ student['dni'] }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <button onclick="window.print()" class="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-p-700 hover:bg-p-600 transition-colors flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"></path></svg>
+              Imprimir QR
+            </button>
+            <button onclick="downloadQR()" class="w-full px-4 py-2.5 rounded-lg text-sm font-semibold border border-purple-300 text-p-700 hover:bg-purple-50 transition-colors flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+              Descargar PNG
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="card p-5">
+    <h3 class="text-sm font-semibold text-gray-900 mb-3">Pasos sugeridos</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+        <span class="inline-flex w-6 h-6 rounded-md bg-p-700 text-white items-center justify-center text-xs font-bold mb-2">1</span>
+        <p class="text-sm font-medium text-gray-800">Imprimir</p>
+        <p class="text-xs text-gray-500 mt-0.5">Copia fisica para el aula o credencial.</p>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+        <span class="inline-flex w-6 h-6 rounded-md bg-p-700 text-white items-center justify-center text-xs font-bold mb-2">2</span>
+        <p class="text-sm font-medium text-gray-800">Entregar</p>
+        <p class="text-xs text-gray-500 mt-0.5">Impreso o en pantalla del dispositivo.</p>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+        <span class="inline-flex w-6 h-6 rounded-md bg-p-700 text-white items-center justify-center text-xs font-bold mb-2">3</span>
+        <p class="text-sm font-medium text-gray-800">Escanear</p>
+        <p class="text-xs text-gray-500 mt-0.5">Registro en la vista Escanear.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media print {
+    body { background: white !important; }
+    nav, .sidebar, .sidebar-overlay, [data-sidebar] { display: none !important; }
+    .card { background: white !important; box-shadow: none !important; border: none !important; }
+    #qr-section { margin: 0 auto; text-align: center; }
+    .grid { display: block !important; }
+  }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var qrImage = document.getElementById('qr-image');
+  qrImage.addEventListener('error', function() {
+    fetch('{{ url_for("student_qr_image", sid=student["id"]) }}').catch(function(){});
+  });
+});
+function downloadQR() {
+  var link = document.createElement('a');
+  link.download = 'QR_{{ student["dni"] }}_{{ student["nombres"] }}_{{ student["apellidos"] }}.png';
+  link.href = '{{ url_for("student_qr_image", sid=student["id"]) }}';
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+</script>
+{% endblock %}

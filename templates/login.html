@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar sesion</title>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: { p: { 600: '#7c0ed0', 700: '#6802c1', 800: '#5301a0', 900: '#3d0170', 950: '#2e0057' } }
+      }}
+    }
+  </script>
+  <style>
+    *{-webkit-font-smoothing:antialiased}
+    input:focus{outline:none;border-color:#7c0ed0;box-shadow:0 0 0 3px rgba(124,14,208,.12)}
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-p-900 via-p-950 to-[#1a0038] flex font-sans">
+  <!-- Left: branding -->
+  <div class="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 text-white">
+    <div>
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/2.png') }}" alt="" class="w-10 h-10 object-contain rounded-xl ring-1 ring-white/20">
+        <span class="text-lg font-bold tracking-tight">Asistencia</span>
+      </div>
+    </div>
+    <div>
+      <h1 class="text-4xl font-extrabold leading-tight mb-4">Control de<br>asistencia rapido<br>y preciso</h1>
+      <p class="text-white/50 text-sm max-w-sm leading-relaxed">Escaneo con codigo de barras y QR. Reportes en tiempo real. Multi-institucion.</p>
+    </div>
+    <p class="text-white/20 text-xs">&copy; <script>document.write(new Date().getFullYear())</script> Sistema de Asistencia</p>
+  </div>
+
+  <!-- Right: form -->
+  <div class="flex-1 flex items-center justify-center p-6">
+    <div class="w-full max-w-sm">
+      <!-- Mobile logo -->
+      <div class="lg:hidden text-center mb-8">
+        <img src="{{ url_for('static', filename='img/2.png') }}" alt="" class="w-12 h-12 mx-auto mb-3 object-contain">
+        <h1 class="text-xl font-bold text-white">Sistema de Asistencia</h1>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-2xl shadow-black/20 p-7">
+        <h2 class="text-lg font-bold text-gray-900 mb-1">Iniciar sesion</h2>
+        <p class="text-sm text-gray-500 mb-6">Ingresa tus credenciales para continuar</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+            <div class="mb-4 flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium
+              {% if category=='error' %}bg-red-50 text-red-700 border border-red-200
+              {% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
+              <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                {% if category=='error' %}<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                {% else %}<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>{% endif %}
+              </svg>
+              {{ message }}
+            </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Usuario</label>
+            <input name="username" required autofocus placeholder="Tu usuario"
+                   class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-300 text-gray-900 placeholder:text-gray-400 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Contrasena</label>
+            <input type="password" name="password" required placeholder="Tu contrasena"
+                   class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-300 text-gray-900 placeholder:text-gray-400 transition">
+          </div>
+          <button type="submit"
+                  class="w-full py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-p-700 to-p-900 hover:from-p-600 hover:to-p-800 shadow-lg shadow-purple-900/30 active:scale-[0.98] transition-all">
+            Iniciar sesion
+          </button>
+        </form>
+
+        <p class="mt-5 text-center text-sm text-gray-500">
+          No tienes cuenta? <a href="{{ url_for('register') }}" class="text-p-700 font-semibold hover:underline">Registrate</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

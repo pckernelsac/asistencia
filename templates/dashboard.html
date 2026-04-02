@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head_extra %}<link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" as="script">{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+    <div>
+      <p class="text-xs font-medium text-p-700 uppercase tracking-wider mb-1">Panel principal</p>
+      <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-gray-400">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span id="live-clock" class="tabular-nums font-medium"></span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="card relative overflow-hidden px-5 py-4 group hover:shadow-md transition-shadow">
+      <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-purple-100 to-transparent rounded-bl-[2.5rem] opacity-60"></div>
+      <div class="relative">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-p-600 to-p-800 flex items-center justify-center shadow-lg shadow-purple-200 mb-3">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </div>
+        <p class="text-2xl font-extrabold text-gray-900 tabular-nums tracking-tight">{{ stats.total_students }}</p>
+        <p class="text-[11px] font-medium text-gray-400 mt-0.5 uppercase tracking-wide">Estudiantes</p>
+      </div>
+    </div>
+
+    <div class="card relative overflow-hidden px-5 py-4 group hover:shadow-md transition-shadow">
+      <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-emerald-100 to-transparent rounded-bl-[2.5rem] opacity-60"></div>
+      <div class="relative">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-200 mb-3">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <p class="text-2xl font-extrabold text-gray-900 tabular-nums tracking-tight">{{ stats.total_attendance }}</p>
+        <p class="text-[11px] font-medium text-gray-400 mt-0.5 uppercase tracking-wide">Total asistencias</p>
+      </div>
+    </div>
+
+    <div class="card relative overflow-hidden px-5 py-4 group hover:shadow-md transition-shadow">
+      <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-blue-100 to-transparent rounded-bl-[2.5rem] opacity-60"></div>
+      <div class="relative">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-200 mb-3">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <p class="text-2xl font-extrabold text-gray-900 tabular-nums tracking-tight">{{ stats.today_attendance }}</p>
+        <p class="text-[11px] font-medium text-gray-400 mt-0.5 uppercase tracking-wide">Hoy</p>
+      </div>
+    </div>
+
+    <div class="card relative overflow-hidden px-5 py-4 group hover:shadow-md transition-shadow">
+      <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-amber-100 to-transparent rounded-bl-[2.5rem] opacity-60"></div>
+      <div class="relative">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-200 mb-3">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        </div>
+        <p class="text-2xl font-extrabold text-gray-900 tabular-nums tracking-tight">{{ rows|length }}</p>
+        <p class="text-[11px] font-medium text-gray-400 mt-0.5 uppercase tracking-wide">Registros</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts + Top students -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Doughnut -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-sm font-bold text-gray-900">Entradas vs Salidas</h3>
+        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Total</span>
+      </div>
+      <div class="flex items-center justify-center">
+        <div class="w-48 h-48"><canvas id="pieChart"></canvas></div>
+      </div>
+      <div class="flex items-center justify-center gap-5 mt-4">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-xs text-gray-500">Entradas</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+          <span class="text-xs text-gray-500">Salidas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bar chart -->
+    <div class="card p-5 lg:col-span-2">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-sm font-bold text-gray-900">Actividad semanal</h3>
+        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ultimos 7 dias</span>
+      </div>
+      <div class="h-56"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Top students -->
+  {% if stats.top_students %}
+  <div class="card overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="text-sm font-bold text-gray-900">Top 5 mas puntuales</h3>
+      <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Por asistencias</span>
+    </div>
+    <div class="divide-y divide-gray-50">
+      {% for student in stats.top_students %}
+      <div class="flex items-center justify-between px-5 py-3 hover:bg-gray-50/60 transition-colors">
+        <div class="flex items-center gap-3">
+          <span class="w-7 h-7 rounded-lg {% if loop.index == 1 %}bg-gradient-to-br from-amber-400 to-amber-600 shadow-sm shadow-amber-200{% elif loop.index == 2 %}bg-gradient-to-br from-gray-300 to-gray-500{% elif loop.index == 3 %}bg-gradient-to-br from-orange-400 to-orange-600{% else %}bg-gray-200{% endif %} text-white flex items-center justify-center text-[11px] font-bold flex-shrink-0">{{ loop.index }}</span>
+          <span class="text-sm font-medium text-gray-800">{{ student.nombre }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:block w-24 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-p-600 to-p-400" style="width:{{ (student.total / stats.top_students[0].total * 100)|round }}%"></div>
+          </div>
+          <span class="text-xs font-bold text-p-700 bg-purple-50 border border-purple-200 px-2.5 py-1 rounded-md tabular-nums min-w-[2.5rem] text-center">{{ student.total }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Search -->
+  <form method="get">
+    <div class="card p-4">
+      <div class="flex gap-2">
+        <div class="relative flex-1">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+          <input name="q" value="{{ q }}" placeholder="Buscar por nombre o DNI..."
+                 class="w-full pl-10 pr-3 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50/50 placeholder:text-gray-400 focus:bg-white">
+        </div>
+        <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-p-700 hover:bg-p-600 transition-colors shadow-sm shadow-purple-200">Buscar</button>
+        {% if q %}<a href="{{ url_for('dashboard') }}" class="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:bg-gray-50 transition-colors">Limpiar</a>{% endif %}
+      </div>
+    </div>
+  </form>
+
+  <!-- Table -->
+  <div class="card overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+      <h2 class="text-sm font-bold text-gray-900">Asistencias recientes</h2>
+      <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{{ rows|length }} registros</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="min-w-full">
+        <thead>
+          <tr class="bg-gray-50/80">
+            <th class="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">#</th>
+            <th class="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">Foto</th>
+            <th class="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">Estudiante</th>
+            <th class="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">DNI</th>
+            <th class="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">Tipo</th>
+            <th class="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">Fecha</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for r in rows %}
+          <tr class="hover:bg-gray-50/60 transition-colors">
+            <td class="px-5 py-3 text-xs text-gray-300 tabular-nums font-medium">{{ r['id'] }}</td>
+            <td class="px-5 py-3">
+              {% if r['photo'] %}<img src="{{ url_for('static', filename='uploads/' + r['photo']) }}" class="w-9 h-9 rounded-xl object-cover border border-gray-200 shadow-sm">
+              {% else %}<div class="w-9 h-9 rounded-xl bg-gradient-to-br from-p-600 to-p-800 flex items-center justify-center text-white text-[10px] font-bold shadow-sm shadow-purple-200">{{ r['nombres'][0] }}{{ r['apellidos'][0] }}</div>{% endif %}
+            </td>
+            <td class="px-5 py-3">
+              <p class="text-sm font-semibold text-gray-800">{{ r['nombres'] }} {{ r['apellidos'] }}</p>
+            </td>
+            <td class="px-5 py-3"><span class="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">{{ r['dni'] }}</span></td>
+            <td class="px-5 py-3">
+              {% if r['tipo']=='ENTRADA' %}<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Entrada</span>
+              {% else %}<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-orange-700 bg-orange-50 border border-orange-200 px-2.5 py-0.5 rounded-md"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Salida</span>{% endif %}
+            </td>
+            <td class="px-5 py-3 text-xs text-gray-500 tabular-nums whitespace-nowrap font-medium" data-ts="{{ r['recorded_at'] }}">{{ r['recorded_at'] }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="px-5 py-16 text-center">
+            <svg class="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <p class="text-sm text-gray-400 font-medium">No hay asistencias registradas</p>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+/* Live clock */
+(function(){var el=document.getElementById('live-clock');if(!el)return;function u(){var d=new Date();var o=d.toLocaleString('es-PE',{timeZone:'America/Lima',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});el.textContent=o}u();setInterval(u,1000)})();
+
+/* Format timestamps */
+function parseTS(str){var r=String(str||'').trim();if(!r)return null;var dp=r.split('T')[0].split(' ')[0];var m=dp.match(/^(\d{4})-(\d{2})-(\d{2})$/);var tm=r.match(/(\d{2}):(\d{2})(?::(\d{2}))?/);if(m){return new Date(+m[1],m[2]-1,+m[3],tm?+tm[1]:0,tm?+tm[2]:0,tm&&tm[3]!=null?+tm[3]:0)}var t=Date.parse(r);return isNaN(t)?null:new Date(t)}
+document.querySelectorAll('[data-ts]').forEach(function(el){var d=parseTS(el.getAttribute('data-ts'));if(!d)return;var p=function(n){return n.toString().padStart(2,'0')};el.textContent=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())});
+
+/* Chart data */
+var byType={{stats.attendance_by_type|tojson}},byDay={{stats.attendance_by_day|tojson}};
+function n(v){var x=Number(v);return isFinite(x)?x:0}
+var ff={family:"'Inter',system-ui,sans-serif"};
+var tt={backgroundColor:'rgba(30,27,75,.95)',padding:{x:12,y:10},cornerRadius:8,titleFont:{...ff,size:12,weight:'600'},bodyFont:{...ff,size:11},borderColor:'rgba(255,255,255,.08)',borderWidth:1};
+
+/* Doughnut */
+var pc=document.getElementById('pieChart');
+if(pc){var ent=n((byType.find(function(t){return t.tipo==='ENTRADA'})||{}).count),sal=n((byType.find(function(t){return t.tipo==='SALIDA'})||{}).count);
+new Chart(pc,{type:'doughnut',data:{labels:['Entradas','Salidas'],datasets:[{data:[ent,sal],backgroundColor:['#059669','#ea580c'],borderWidth:0,borderRadius:6,spacing:3}]},options:{responsive:true,maintainAspectRatio:true,cutout:'72%',plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:function(c){var v=typeof c.parsed==='number'?c.parsed:n(c.raw);var t=c.dataset.data.reduce(function(a,b){return a+n(b)},0);return c.label+': '+v+' ('+(t>0?((v/t)*100).toFixed(1):0)+'%)'}}}}}});}
+
+/* Bar */
+var bc=document.getElementById('barChart');
+if(bc){var lbl=byDay.map(function(d){var r=String(d.fecha||'').split('T')[0];var m=r.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m)return new Date(+m[1],m[2]-1,+m[3]).toLocaleDateString('es-ES',{weekday:'short',day:'numeric'});var dt=new Date(d.fecha);return isNaN(dt.getTime())?String(d.fecha):dt.toLocaleDateString('es-ES',{weekday:'short',day:'numeric'})});
+new Chart(bc,{type:'bar',data:{labels:lbl,datasets:[{label:'Asistencias',data:byDay.map(function(d){return n(d.count)}),backgroundColor:function(ctx){var g=ctx.chart.ctx.createLinearGradient(0,0,0,ctx.chart.height);g.addColorStop(0,'#7c0ed0');g.addColorStop(1,'#c084fc');return g},borderRadius:8,borderSkipped:false,barPercentage:.5,maxBarThickness:40}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:function(c){return 'Asistencias: '+(typeof c.parsed==='object'?c.parsed.y:n(c.raw))}}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{...ff,size:10,weight:'500'},color:'#9ca3af',padding:8},grid:{color:'#f3f4f6',drawBorder:false},border:{display:false}},x:{ticks:{font:{...ff,size:10,weight:'500'},color:'#9ca3af',padding:4},grid:{display:false},border:{display:false}}}}});}
+</script>
+{% endblock %}

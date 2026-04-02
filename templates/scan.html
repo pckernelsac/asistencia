@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Escanear{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-5">
+  <div>
+    <h1 class="text-xl font-bold text-gray-900">Escanear</h1>
+    <p class="text-sm text-gray-500 mt-0.5">Registre asistencia con lector de barras o camara QR</p>
+  </div>
+
+  <!-- Toggle -->
+  <div class="flex gap-1 p-1 bg-gray-100 rounded-xl border border-gray-200">
+    <button id="btn-barcode-mode" onclick="switchMode('barcode')" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-gray-900 shadow-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+      Lector de barras
+    </button>
+    <button id="btn-qr-mode" onclick="switchMode('qr')" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all text-gray-500 hover:text-gray-700">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Camara QR
+    </button>
+  </div>
+
+  <!-- Barcode -->
+  <div id="barcode-container" class="card p-6">
+    <div class="text-center mb-5">
+      <div class="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-7 h-7 text-p-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+      </div>
+      <p class="text-sm font-medium text-gray-700">Listo para escanear</p>
+    </div>
+    <input id="scan-input" type="text" inputmode="numeric" autocomplete="off" autofocus
+           placeholder="Esperando lectura..."
+           class="w-full px-4 py-3 rounded-xl border border-gray-300 text-base font-medium text-center tracking-widest placeholder:text-gray-400 transition-all focus:border-p-600 focus:ring-2 focus:ring-p-600/20">
+    <p class="text-xs text-gray-400 text-center mt-2">Deteccion automatica al terminar el escaneo</p>
+    <div class="grid grid-cols-3 gap-4 pt-5 mt-5 border-t border-gray-100">
+      <div class="text-center"><p class="text-xl font-bold text-p-700 tabular-nums" id="total-today">0</p><p class="text-[11px] text-gray-500 mt-0.5">Hoy</p></div>
+      <div class="text-center"><p class="text-xl font-bold text-gray-800 tabular-nums" id="total-session">0</p><p class="text-[11px] text-gray-500 mt-0.5">Sesion</p></div>
+      <div class="text-center"><p class="text-xl font-bold text-gray-800 tabular-nums" id="scan-speed">&mdash;</p><p class="text-[11px] text-gray-500 mt-0.5">Ultima</p></div>
+    </div>
+  </div>
+
+  <!-- QR -->
+  <div id="qr-container" class="hidden card p-6">
+    <div class="text-center mb-5">
+      <div class="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-7 h-7 text-p-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </div>
+      <p class="text-sm font-medium text-gray-700">Escaneo por camara</p>
+    </div>
+    <div id="qr-reader" class="rounded-xl overflow-hidden border border-gray-200 mb-3"></div>
+    <p class="text-xs text-gray-400 text-center" id="qr-status">Coloque el codigo QR frente a la camara</p>
+    <div class="grid grid-cols-3 gap-4 pt-5 mt-5 border-t border-gray-100">
+      <div class="text-center"><p class="text-xl font-bold text-p-700 tabular-nums" id="total-today-qr">0</p><p class="text-[11px] text-gray-500 mt-0.5">Hoy</p></div>
+      <div class="text-center"><p class="text-xl font-bold text-gray-800 tabular-nums" id="total-session-qr">0</p><p class="text-[11px] text-gray-500 mt-0.5">Sesion</p></div>
+      <div class="text-center"><p class="text-xl font-bold text-gray-800 tabular-nums" id="scan-speed-qr">&mdash;</p><p class="text-[11px] text-gray-500 mt-0.5">Ultima</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="student-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,.6);backdrop-filter:blur(4px)">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-sm w-full transform scale-0 transition-transform duration-300" id="modal-content">
+    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-5 text-center">
+      <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+      </div>
+      <h3 class="text-base font-bold text-white">Asistencia Registrada</h3>
+      <p class="text-white/70 text-xs mt-1" id="modal-time">&mdash;</p>
+    </div>
+    <div class="p-6 text-center">
+      <div class="mb-3 flex justify-center">
+        <div id="student-photo-container">
+          <img id="student-photo" src="" alt="" class="w-20 h-20 rounded-xl object-cover border-2 border-gray-200">
+          <div id="student-initials" class="w-20 h-20 rounded-xl flex items-center justify-center text-2xl font-bold bg-p-700 text-white hidden"></div>
+        </div>
+      </div>
+      <h4 id="student-name" class="text-base font-bold text-gray-900 mb-2">&mdash;</h4>
+      <div class="flex justify-center mb-2">
+        <span id="tipo-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold">
+          <svg id="tipo-icon" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"/></svg>
+          <span id="tipo-text">&mdash;</span>
+        </span>
+      </div>
+      <p class="text-sm text-gray-500 font-mono" id="student-dni">&mdash;</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+var TH=80,ML=8,buf="",lt=0,tmr=null,sc=0,cm='barcode',qr=null,qrs=false,lsa=0,lsr='',DB=2000;
+function norm(r){var s=String(r==null?'':r).trim();if(!s)return'';var m=s.match(/\d{8}/);if(m)return m[0];var d=s.replace(/\D/g,'');return d.length===8?d:''}
+var toast=function(m,t){var e=document.getElementById('toast');e.textContent=m;e.className='toast show '+(t||'');setTimeout(function(){e.className='toast'},3000)};
+var inp=document.getElementById('scan-input'),modal=document.getElementById('student-modal'),mc=document.getElementById('modal-content');
+inp.focus();
+
+function switchMode(mode){
+  cm=mode;var bc=document.getElementById('barcode-container'),qc=document.getElementById('qr-container'),b1=document.getElementById('btn-barcode-mode'),b2=document.getElementById('btn-qr-mode');
+  if(mode==='barcode'){bc.classList.remove('hidden');qc.classList.add('hidden');b1.className='flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-gray-900 shadow-sm';b2.className='flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all text-gray-500 hover:text-gray-700';stopQr();inp.focus()}
+  else{bc.classList.add('hidden');qc.classList.remove('hidden');b1.className='flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all text-gray-500 hover:text-gray-700';b2.className='flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-gray-900 shadow-sm';startQr()}
+}
+
+function startQr(){if(qrs)return;document.getElementById('qr-status').textContent='Iniciando camara...';try{qr=new Html5Qrcode("qr-reader");qr.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},function(t){document.getElementById('qr-status').textContent='Codigo detectado!';submitCode(t);setTimeout(function(){if(cm==='qr')document.getElementById('qr-status').textContent='Listo para siguiente escaneo'},1500)},function(){}).then(function(){qrs=true;document.getElementById('qr-status').textContent='Camara activa'}).catch(function(e){toast('Error al acceder a la camara','error');document.getElementById('qr-status').textContent='Error: '+e.message})}catch(e){toast('Error al inicializar QR','error')}}
+function stopQr(){if(qr&&qrs)qr.stop().then(function(){qrs=false;qr=null}).catch(function(){})}
+
+function scheduleFlush(){if(tmr)clearTimeout(tmr);tmr=setTimeout(function(){if(buf.length>=ML){var c=buf;buf="";inp.value="";submitCode(c)}else buf=""},TH)}
+document.addEventListener('keydown',function(e){if(cm!=='barcode'||e.ctrlKey||e.altKey||e.metaKey)return;if(['Shift','Tab','Backspace','Escape','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.key)>=0)return;var now=performance.now();if(now-lt>500)buf="";lt=now;if(e.key.length===1&&/[0-9A-Za-z]/.test(e.key)){buf+=e.key;inp.value=buf;scheduleFlush();e.preventDefault()}});
+
+function tipoLabel(t){return t==='ENTRADA'?'Entrada':t==='SALIDA'?'Salida':t||'—'}
+function tipoLow(t){return t==='ENTRADA'?'entrada':t==='SALIDA'?'salida':String(t||'').toLowerCase()||'registro'}
+
+function showModal(s,ts,tipo,err){
+  var ph=document.getElementById('student-photo'),ini=document.getElementById('student-initials'),hd=document.querySelector('#student-modal .bg-gradient-to-r'),tl=document.querySelector('#student-modal h3');
+  if(s.photo_url){ph.src=s.photo_url;ph.classList.remove('hidden');ini.classList.add('hidden')}else{ini.textContent=s.nombres.charAt(0).toUpperCase()+s.apellidos.charAt(0).toUpperCase();ph.classList.add('hidden');ini.classList.remove('hidden')}
+  document.getElementById('student-name').textContent=s.nombres+' '+s.apellidos;document.getElementById('student-dni').textContent='DNI: '+s.dni;document.getElementById('modal-time').textContent=ts;
+  if(err){hd.className='bg-gradient-to-r from-red-500 to-red-600 px-6 py-5 text-center';tl.textContent='Registro Duplicado';document.getElementById('modal-time').textContent='Ya registro su '+tipoLow(tipo)+' hoy'}else{hd.className='bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-5 text-center';tl.textContent='Asistencia Registrada'}
+  var tb=document.getElementById('tipo-badge'),tt=document.getElementById('tipo-text'),ti=document.getElementById('tipo-icon');tt.textContent=tipoLabel(tipo);
+  if(tipo==='ENTRADA'){tb.className='inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200';ti.innerHTML='<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"/>'}
+  else{tb.className='inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-orange-700 bg-orange-50 border border-orange-200';ti.innerHTML='<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"/>'}
+  modal.classList.remove('hidden');modal.classList.add('flex');setTimeout(function(){mc.style.transform='scale(1)'},10);
+  if(err)playErr();else playOk();
+  setTimeout(function(){mc.style.transform='scale(0)';setTimeout(function(){modal.classList.add('hidden');modal.classList.remove('flex')},300)},5000);
+}
+
+async function submitCode(code){
+  var nrm=norm(code);if(!/^\d{8}$/.test(nrm)){toast('Se necesita un DNI de 8 digitos','error');playErr();if(cm==='barcode')inp.focus();return}
+  var now=Date.now();if(nrm===lsr&&now-lsa<DB)return;lsr=nrm;lsa=now;var t0=performance.now();
+  try{var res=await fetch('{{url_for("api_scan")}}',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({code:nrm})});
+  var data={};var ct=(res.headers.get('content-type')||'').toLowerCase();
+  if(ct.includes('application/json')){try{data=await res.json()}catch(e){toast('Respuesta invalida','error');playErr();return}}else if(!res.ok){toast('Sesion expirada','error');playErr();return}
+  var ms=Math.round(performance.now()-t0);
+  if(data.student&&data.tipo){if(data.ok){sc++;var n=parseInt(document.getElementById('total-today').textContent,10)||0;document.getElementById('total-today').textContent=String(n+1);document.getElementById('total-today-qr').textContent=String(n+1)}
+  document.getElementById('total-session').textContent=sc;document.getElementById('total-session-qr').textContent=sc;document.getElementById('scan-speed').textContent=ms+'ms';document.getElementById('scan-speed-qr').textContent=ms+'ms';
+  showModal(data.student,data.when||'',data.tipo,!data.ok)}else if(!res.ok||!data.ok){toast(data.message||'Error al registrar','error');playErr()}}
+  catch(e){toast('Error de conexion','error');playErr()}finally{if(cm==='barcode')inp.focus()}}
+
+function playOk(){try{var c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.1);g.gain.setValueAtTime(.001,c.currentTime);g.gain.exponentialRampToValueAtTime(.3,c.currentTime+.01);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.15);o.start();o.stop(c.currentTime+.15)}catch(e){}}
+function playErr(){try{var c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.setValueAtTime(200,c.currentTime);g.gain.setValueAtTime(.001,c.currentTime);g.gain.exponentialRampToValueAtTime(.2,c.currentTime+.01);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.2);o.start();o.stop(c.currentTime+.2)}catch(e){}}
+window.addEventListener('focus',function(){if(cm==='barcode')inp.focus()});
+window.addEventListener('beforeunload',function(){stopQr()});
+</script>
+{% endblock %}
