@@ -159,7 +159,7 @@
           <tr class="hover:bg-gray-50/60 transition-colors">
             <td class="px-5 py-3 text-xs text-gray-300 tabular-nums font-medium">{{ r['id'] }}</td>
             <td class="px-5 py-3">
-              {% if r['photo'] %}<img src="{{ url_for('static', filename='uploads/' + r['photo']) }}" class="w-9 h-9 rounded-xl object-cover border border-gray-200 shadow-sm">
+              {% if r['photo'] %}<img src="{{ photo_url(r['photo']) }}" class="w-9 h-9 rounded-xl object-cover border border-gray-200 shadow-sm">
               {% else %}<div class="w-9 h-9 rounded-xl bg-gradient-to-br from-p-600 to-p-800 flex items-center justify-center text-white text-[10px] font-bold shadow-sm shadow-purple-200">{{ r['nombres'][0] }}{{ r['apellidos'][0] }}</div>{% endif %}
             </td>
             <td class="px-5 py-3">

@@ -33,6 +33,7 @@ from werkzeug.utils import secure_filename
 from zoneinfo import ZoneInfo
 
 import db as dbx
+import storage
 
 load_dotenv()
 
@@ -433,6 +434,7 @@ def inject_tenant():
         "current_institution_id": session.get("institution_id"),
         "nav_home_url": home,
         "is_super_master": bool(session.get("is_super_master")),
+        "photo_url": storage.public_url,
     }
 
 
@@ -1047,7 +1049,7 @@ def api_scan():
         ts = now.strftime("%Y-%m-%d %H:%M:%S")
         photo_url = None
         if student["photo"]:
-            photo_url = url_for("static", filename=f"uploads/{student['photo']}")
+            photo_url = storage.public_url(student["photo"])
         return (
             jsonify(
                 {
@@ -1107,8 +1109,9 @@ def students():
             file = request.files["photo"]
             if file and file.filename and allowed_file(file.filename):
                 unique_filename = photo_name_for_save(iid, dni, file.filename)
-                file.save(os.path.join(app.config["UPLOAD_FOLDER"], unique_filename))
-                photo_filename = unique_filename
+                result = storage.upload(file, unique_filename, file.content_type or "image/jpeg")
+                if result:
+                    photo_filename = unique_filename
 
         try:
             with dbx.get_connection() as conn:
@@ -1190,12 +1193,11 @@ def edit_student(sid: int):
             file = request.files["photo"]
             if file and file.filename and allowed_file(file.filename):
                 if student["photo"]:
-                    old_photo_path = os.path.join(app.config["UPLOAD_FOLDER"], student["photo"])
-                    if os.path.exists(old_photo_path):
-                        os.remove(old_photo_path)
+                    storage.delete(student["photo"])
                 unique_filename = photo_name_for_save(iid, dni, file.filename)
-                file.save(os.path.join(app.config["UPLOAD_FOLDER"], unique_filename))
-                photo_filename = unique_filename
+                result = storage.upload(file, unique_filename, file.content_type or "image/jpeg")
+                if result:
+                    photo_filename = unique_filename
 
         try:
             with dbx.get_connection() as conn:
@@ -1232,9 +1234,7 @@ def delete_student(sid: int):
         return redirect(url_for("students"))
 
     if st["photo"]:
-        photo_path = os.path.join(app.config["UPLOAD_FOLDER"], st["photo"])
-        if os.path.exists(photo_path):
-            os.remove(photo_path)
+        storage.delete(st["photo"])
 
     with dbx.get_connection() as conn:
         cur = conn.cursor()
@@ -1474,6 +1474,8 @@ def reports():
 @app.route("/uploads/<filename>")
 @tenant_required
 def uploads(filename):
+    if storage._use_supabase():
+        return redirect(storage.public_url(filename))
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 

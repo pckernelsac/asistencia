@@ -33,7 +33,7 @@
         <label class="block text-xs font-medium text-gray-600 mb-1">Foto</label>
         {% if student['photo'] %}
         <div class="flex items-center gap-4 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <img src="{{ url_for('static', filename='uploads/' + student['photo']) }}" alt="" class="w-20 h-20 rounded-lg object-cover border border-gray-200">
+          <img src="{{ photo_url(student['photo']) }}" alt="" class="w-20 h-20 rounded-lg object-cover border border-gray-200">
           <p class="text-xs text-gray-500">Selecciona una nueva foto para reemplazar la actual, o deja vacio para mantenerla.</p>
         </div>
         {% else %}

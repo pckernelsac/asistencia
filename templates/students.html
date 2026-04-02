@@ -94,7 +94,7 @@
               <tr class="hover:bg-gray-50/60 transition-colors">
                 <td class="px-4 py-3">
                   {% if s['photo'] %}
-                  <img src="{{ url_for('static', filename='uploads/' + s['photo']) }}" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-200">
+                  <img src="{{ photo_url(s['photo']) }}" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-200">
                   {% else %}
                   <div class="w-10 h-10 rounded-lg bg-p-700 flex items-center justify-center text-white font-semibold text-xs">{{ s['nombres'][0] }}{{ s['apellidos'][0] }}</div>
                   {% endif %}
