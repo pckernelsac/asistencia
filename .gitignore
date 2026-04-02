@@ -31,3 +31,6 @@ test_concurrency.py
 .DS_Store
 Thumbs.db
 festihack_produccion.zip
+
+.vercel
+.env*.local
