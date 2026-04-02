@@ -38,10 +38,12 @@ load_dotenv()
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, "instance", "asistencia.db")
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+UPLOAD_FOLDER = os.path.join("/tmp", "uploads") if IS_VERCEL else os.path.join(BASE_DIR, "static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 
-os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
+if not IS_VERCEL:
+    os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 dbx.set_sqlite_path(DB_PATH)

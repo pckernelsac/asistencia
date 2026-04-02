@@ -45,10 +45,11 @@ def _get_pg_pool():
         url = os.environ["DATABASE_URL"].strip()
         _pg_pool = ConnectionPool(
             conninfo=url,
-            min_size=2,
-            max_size=10,
+            min_size=0,
+            max_size=5,
             kwargs={"row_factory": dict_row},
             timeout=30.0,
+            max_idle=300.0,
         )
     return _pg_pool
 
